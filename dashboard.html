@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Designs — ROOMIFY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+</head>
+<body>
+    <header class="dash-header">
+        <div class="dash-left">
+            <a href="index.html" class="brand-logo">
+                <span class="logo-icon"><i class="fa-solid fa-cube"></i></span>
+                <span>ROOMIFY</span>
+            </a>
+            <nav class="dash-nav">
+                <a href="dashboard.html" class="active">Dashboard</a>
+                <a href="editor.html">3D Studio</a>
+            </nav>
+        </div>
+        <div class="dash-right">
+            <div class="search-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="dashSearchInput" placeholder="Search saved rooms...">
+            </div>
+            <div class="user-profile-pill" id="profileSettingsBtn" title="Profile & Studio Settings">
+                <div class="avatar">SD</div>
+                <div class="user-meta">
+                    <span class="u-name">Studio Designer</span>
+                    <span class="u-role">Pro Access</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="dash-container">
+        <section class="dash-hero-banner">
+            <div>
+                <h1>Interior Design Workspace</h1>
+                <p>Create new 3D room plans, manage saved layouts, and track project budgets in INR.</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+                <div class="dash-kpis">
+                    <div class="kpi-card">
+                        <span id="kpiTotalDesigns">0</span>
+                        <label>Saved Rooms</label>
+                    </div>
+                    <div class="kpi-card">
+                        <span id="kpiTotalValue">₹0</span>
+                        <label>Portfolio Value</label>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-lg" id="openNewDesignModalBtn">
+                    <i class="fa-solid fa-plus"></i> Create New Design
+                </button>
+            </div>
+        </section>
+
+        <section class="dash-section">
+            <div class="section-head">
+                <h2><i class="fa-regular fa-clock"></i> Recently Edited Designs</h2>
+                <span class="badge-muted" id="storageModeBadge">Connecting...</span>
+            </div>
+            <div class="designs-grid" id="recentDesignsGrid"></div>
+        </section>
+
+        <section class="dash-section">
+            <div class="section-head">
+                <h2><i class="fa-solid fa-layer-group"></i> My Designs</h2>
+                <div class="filter-pills">
+                    <button class="pill active" data-room-filter="all">All</button>
+                    <button class="pill" data-room-filter="Living Room">Living Room</button>
+                    <button class="pill" data-room-filter="Bedroom">Bedroom</button>
+                    <button class="pill" data-room-filter="Kitchen">Kitchen</button>
+                    <button class="pill" data-room-filter="Study Room">Study Room</button>
+                    <button class="pill" data-room-filter="Dining Room">Dining Room</button>
+                </div>
+            </div>
+            <div class="designs-grid" id="allDesignsGrid"></div>
+        </section>
+    </main>
+
+    <!-- Create New Design Modal -->
+    <div class="modal-backdrop hidden" id="newDesignModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Create New 3D Room</h3>
+                <button class="modal-close" data-close-modal="newDesignModal">&times;</button>
+            </div>
+            <form id="newDesignForm">
+                <div class="form-group">
+                    <label>Design Name</label>
+                    <input type="text" id="newDesignName" value="Modern Master Bedroom" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Room Type</label>
+                        <select id="newRoomType">
+                            <option value="Living Room">Living Room</option>
+                            <option value="Bedroom" selected>Bedroom</option>
+                            <option value="Kitchen">Kitchen</option>
+                            <option value="Study Room">Study Room</option>
+                            <option value="Dining Room">Dining Room</option>
+                            <option value="Custom Room">Custom Room</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Initial Theme</label>
+                        <select id="newRoomTheme">
+                            <option value="Modern Minimalist">Modern Minimalist</option>
+                            <option value="Contemporary">Contemporary</option>
+                            <option value="Scandinavian">Scandinavian</option>
+                            <option value="Industrial">Industrial</option>
+                            <option value="Traditional Indian">Traditional Indian</option>
+                            <option value="Luxury">Luxury</option>
+                            <option value="Bohemian">Bohemian</option>
+                            <option value="Classic">Classic</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row three">
+                    <div class="form-group">
+                        <label>Width (m)</label>
+                        <input type="number" id="newRoomWidth" value="5.2" step="0.2" min="2.5" max="15">
+                    </div>
+                    <div class="form-group">
+                        <label>Length (m)</label>
+                        <input type="number" id="newRoomLength" value="4.4" step="0.2" min="2.5" max="15">
+                    </div>
+                    <div class="form-group">
+                        <label>Height (m)</label>
+                        <input type="number" id="newWallHeight" value="2.8" step="0.1" min="2.2" max="4.5">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Target Budget Limit (₹ INR)</label>
+                    <input type="number" id="newBudgetLimit" value="200000" step="5000" min="10000">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" data-close-modal="newDesignModal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Launch 3D Editor</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Rename Modal -->
+    <div class="modal-backdrop hidden" id="renameModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Rename Design</h3>
+                <button class="modal-close" data-close-modal="renameModal">&times;</button>
+            </div>
+            <form id="renameForm">
+                <input type="hidden" id="renameDesignId">
+                <div class="form-group">
+                    <label>New Design Title</label>
+                    <input type="text" id="renameInput" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" data-close-modal="renameModal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Name</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-backdrop hidden" id="deleteModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Delete Design?</h3>
+                <button class="modal-close" data-close-modal="deleteModal">&times;</button>
+            </div>
+            <input type="hidden" id="deleteDesignId">
+            <p style="font-size:0.9rem;color:var(--text-muted);">Are you sure you want to permanently delete <strong id="deleteDesignTitle"></strong>?</p>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" data-close-modal="deleteModal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete Design</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Settings Modal -->
+    <div class="modal-backdrop hidden" id="profileModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Studio Profile & Settings</h3>
+                <button class="modal-close" data-close-modal="profileModal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Designer Display Name</label>
+                <input type="text" id="prefUserName" value="Studio Designer">
+            </div>
+            <div class="form-group">
+                <label>Measurement & Currency Standard</label>
+                <input type="text" value="Metric (Meters) • Indian Rupee (₹ INR)" disabled>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" data-close-modal="profileModal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveProfilePrefsBtn">Save Preferences</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

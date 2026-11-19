@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Room Studio — ROOMIFY</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/editor.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+<body class="editor-body">
+    <header class="editor-topbar">
+        <div class="topbar-left">
+            <a href="dashboard.html" class="back-dash-btn" title="Back to Dashboard">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <a href="index.html" class="brand-logo" style="font-size:1rem;">
+                <span class="logo-icon" style="width:28px;height:28px;font-size:0.85rem;"><i class="fa-solid fa-cube"></i></span>
+                <span>ROOMIFY</span>
+            </a>
+            <div class="divider-v"></div>
+            <input type="text" id="designNameInput" class="design-title-input" value="Untitled Room">
+            <span class="autosave-badge" id="autosaveStatus"><i class="fa-solid fa-check"></i> Ready</span>
+        </div>
+
+        <div class="topbar-center">
+            <button class="tool-chip" id="undoBtn" title="Undo"><i class="fa-solid fa-rotate-left"></i> Undo</button>
+            <button class="tool-chip" id="redoBtn" title="Redo"><i class="fa-solid fa-rotate-right"></i> Redo</button>
+            <button class="tool-chip" id="resetRoomBtn" title="Clear All Furniture"><i class="fa-solid fa-broom"></i> Reset</button>
+            <button class="tool-chip" id="toggleRefPhotoBtn" title="Reference Photo"><i class="fa-regular fa-image"></i> Ref Photo</button>
+        </div>
+
+        <div class="topbar-right">
+            <button class="budget-pill-btn" id="openBudgetDrawerBtn" title="View Budget Breakdown">
+                <i class="fa-solid fa-indian-rupee-sign"></i>
+                <span id="headerTotalBudget">₹0</span>
+            </button>
+            <button class="tool-chip" id="exportPngBtn"><i class="fa-solid fa-camera"></i> Export PNG</button>
+            <button class="btn btn-white btn-sm" id="saveDesignBtn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+        </div>
+    </header>
+
+    <div class="workspace-shell">
+        <aside class="left-sidebar">
+            <nav class="blue-tool-rail">
+                <button class="rail-tab" data-panel="roomConfigPanel">
+                    <i class="fa-solid fa-vector-square"></i><span>Room</span>
+                </button>
+                <button class="rail-tab active" data-panel="furniturePanel">
+                    <i class="fa-solid fa-couch"></i><span>Furniture</span>
+                </button>
+                <button class="rail-tab" data-panel="wallsPanel">
+                    <i class="fa-solid fa-paint-roller"></i><span>Walls</span>
+                </button>
+                <button class="rail-tab" data-panel="flooringPanel">
+                    <i class="fa-solid fa-border-all"></i><span>Flooring</span>
+                </button>
+                <button class="rail-tab" data-panel="lightingPanel">
+                    <i class="fa-regular fa-lightbulb"></i><span>Lighting</span>
+                </button>
+                <button class="rail-tab" data-panel="decorPanel">
+                    <i class="fa-solid fa-seedling"></i><span>Decor</span>
+                </button>
+                <button class="rail-tab" data-panel="themesPanel">
+                    <i class="fa-solid fa-palette"></i><span>Themes</span>
+                </button>
+                <button class="rail-tab" data-panel="budgetPanel">
+                    <i class="fa-solid fa-calculator"></i><span>Budget</span>
+                </button>
+            </nav>
+
+            <div class="left-drawer">
+                <div class="drawer-pane" id="roomConfigPanel">
+                    <div class="pane-header">
+                        <h3>Room Configuration</h3>
+                        <span class="pane-sub">Dimensions, layout & openings</span>
+                    </div>
+                    <div class="pane-scroll">
+                        <div class="ctrl-group">
+                            <label>Room Type</label>
+                            <select id="roomTypeSelect">
+                                <option value="Living Room">Living Room</option>
+                                <option value="Bedroom">Bedroom</option>
+                                <option value="Kitchen">Kitchen</option>
+                                <option value="Study Room">Study Room</option>
+                                <option value="Dining Room">Dining Room</option>
+                                <option value="Custom Room">Custom Room</option>
+                            </select>
+                        </div>
+                        <div class="ctrl-group">
+                            <label>Room Shape</label>
+                            <select id="roomShapeSelect">
+                                <option value="rectangle">Standard Rectangular</option>
+                                <option value="alcove">Studio with Partition Alcove</option>
+                            </select>
+                        </div>
+                        <div class="ctrl-row-2">
+                            <div class="ctrl-group">
+                                <label>Width (m)</label>
+                                <input type="number" id="roomWidthInput" value="5.4" step="0.2" min="2.5" max="15">
+                            </div>
+                            <div class="ctrl-group">
+                                <label>Length (m)</label>
+                                <input type="number" id="roomLengthInput" value="4.6" step="0.2" min="2.5" max="15">
+                            </div>
+                        </div>
+                        <div class="ctrl-row-2">
+                            <div class="ctrl-group">
+                                <label>Wall Height (m)</label>
+                                <input type="number" id="wallHeightInput" value="2.8" step="0.1" min="2.2" max="4.5">
+                            </div>
+                            <div class="ctrl-group">
+                                <label>Thickness (m)</label>
+                                <input type="number" id="wallThickInput" value="0.18" step="0.02" min="0.1" max="0.4">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary w-100" id="applyRoomDimsBtn">Apply Dimensions</button>
+
+                        <hr class="pane-sep">
+                        <div class="toggle-row">
+                            <span>Entry Door (North Wall)</span>
+                            <input type="checkbox" id="toggleDoorCheck" checked>
+                        </div>
+                        <div class="ctrl-group">
+                            <label>Door Position Offset</label>
+                            <input type="range" id="doorPosSlider" min="-2" max="2" step="0.1" value="1.1">
+                        </div>
+
+                        <div class="toggle-row">
+                            <span>Window (West Wall)</span>
+                            <input type="checkbox" id="toggleWindowCheck" checked>
+                        </div>
+                        <div class="ctrl-group">
+                            <label>Window Position Offset</label>
+                            <input type="range" id="windowPosSlider" min="-2" max="2" step="0.1" value="0">
+                        </div>
+
+                        <hr class="pane-sep">
+                        <div class="toggle-row">
+                            <span>Show Grid & Dimensions</span>
+                            <input type="checkbox" id="toggleDimsCheck" checked>
+                        </div>
+                        <div class="toggle-row">
+                            <span>Snap Furniture to 0.1m Grid</span>
+                            <input type="checkbox" id="toggleSnapCheck" checked>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drawer-pane active" id="furniturePanel">
+                    <div class="pane-header">
+                        <h3>Furniture Catalog</h3>
+                        <span class="pane-sub">Click or drag items into the 3D room</span>
+                    </div>
+                    <div class="catalog-filters">
+                        <div class="search-box-sm">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="catalogSearchInput" placeholder="Search sofa, bed, desk...">
+                        </div>
+                        <select id="catalogCategorySelect">
+                            <option value="all">All Categories</option>
+                            <option value="beds">Beds</option>
+                            <option value="sofas">Sofas</option>
+                            <option value="chairs">Chairs</option>
+                            <option value="tables">Tables</option>
+                            <option value="wardrobes">Wardrobes</option>
+                            <option value="cabinets">Cabinets</option>
+                            <option value="desks">Desks</option>
+                            <option value="bookshelves">Bookshelves</option>
+                            <option value="tv_units">TV Units</option>
+                            <option value="dining_tables">Dining Tables</option>
+                            <option value="lamps">Lamps</option>
+                            <option value="curtains">Curtains</option>
+                            <option value="decor">Decorative Items</option>
+                        </select>
+                        <div class="price-filter-row">
+                            <span>Max Price: <strong id="maxPriceLabel">₹50,000</strong></span>
+                            <input type="range" id="catalogPriceRange" min="2000" max="50000" step="1000" value="50000">
+                        </div>
+                    </div>
+                    <div class="pane-scroll catalog-grid" id="furnitureCatalogGrid"></div>
+                </div>
+
+                <div class="drawer-pane" id="wallsPanel">
+                    <div class="pane-header">
+                        <h3>Walls & Wallpapers</h3>
+                        <span class="pane-sub">Customize all walls or an accent wall</span>
+                    </div>
+                    <div class="pane-scroll">
+                        <div class="ctrl-group">
+                            <label>Target Wall</label>
+                            <select id="targetWallSelect">
+                                <option value="all">All Walls</option>
+                                <option value="north">North Wall (Door Wall)</option>
+                                <option value="west">West Wall (Window Wall)</option>
+                                <option value="south">South Front Cutaway</option>
+                                <option value="east">East Right Cutaway</option>
+                            </select>
+                        </div>
+                        <div class="ctrl-group">
+                            <label>Paint Swatches</label>
+                            <div class="swatch-palette" id="wallColorSwatches"></div>
+                            <input type="color" id="wallCustomColor" class="color-picker-bar" value="#F3F4F6">
+                        </div>
+                        <div class="ctrl-group">
+                            <label>Surface Material & Wallpaper</label>
+                            <div class="finish-grid" id="wallFinishGrid">
+                                <button class="finish-btn active" data-wall-finish="paint">Matte Paint</button>
+                                <button class="finish-btn" data-wall-finish="plaster">Venetian Plaster</button>
+                                <button class="finish-btn" data-wall-finish="brick">Exposed Brick</button>
+                                <button class="finish-btn" data-wall-finish="wood_panel">Wood Slats</button>
+                                <button class="finish-btn" data-wall-finish="wallpaper_stripe">Classic Stripes</button>
+                                <button class="finish-btn" data-wall-finish="wallpaper_geo">Geometric Paper</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drawer-pane" id="flooringPanel">
+                    <div class="pane-header">
+                        <h3>Flooring</h3>
+                        <span class="pane-sub">Select floor material & color tint</span>
+                    </div>
+                    <div class="pane-scroll">
+                        <div class="floor-cards" id="floorTypeGrid">
+                            <button class="floor-card active" data-floor="wood">
+                                <span class="f-preview wood"></span>
+                                <div><strong>Oak Hardwood</strong><small>Warm natural planks</small></div>
+                            </button>
+                            <button class="floor-card" data-floor="marble">
+                                <span class="f-preview marble"></span>
+                                <div><strong>Carrara Marble</strong><small>Polished veined stone</small></div>
+                            </button>
+                            <button class="floor-card" data-floor="ceramic">
+                                <span class="f-preview ceramic"></span>
+                                <div><strong>Ceramic Tiles</strong><small>Modern matte grid</small></div>
+                            </button>
+                            <button class="floor-card" data-floor="granite">
+                                <span class="f-preview granite"></span>
+                                <div><strong>Speckled Granite</strong><small>Architectural stone</small></div>
+                            </button>
+                            <button class="floor-card" data-floor="carpet">
+                                <span class="f-preview carpet"></span>
+                                <div><strong>Woven Carpet</strong><small>Soft acoustic texture</small></div>
+                            </button>
+                            <button class="floor-card" data-floor="plain">
+                                <span class="f-preview plain"></span>
+                                <div><strong>Plain Microcement</strong><small>Minimalist finish</small></div>
+                            </button>
+                        </div>
+                        <hr class="pane-sep">
+                        <div class="ctrl-group">
+                            <label>Floor Tone / Tint</label>
+                            <input type="color" id="floorTintColor" class="color-picker-bar" value="#C69C6D">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drawer-pane" id="lightingPanel">
+                    <div class="pane-header">
+                        <h3>Studio Lighting</h3>
+                        <span class="pane-sub">Day/Night ambience & light fixtures</span>
+                    </div>
+                    <div class="pane-scroll">
+                        <div class="mode-switch-box">
+                            <button class="mode-btn active" id="dayModeBtn"><i class="fa-solid fa-sun"></i> Daytime</button>
+                            <button class="mode-btn" id="nightModeBtn"><i class="fa-solid fa-moon"></i> Nighttime</button>
+                        </div>
+                        <div class="ctrl-group">
+                            <label>Ambient Brightness: <strong id="ambientValLabel">65%</strong></label>
+                            <input type="range" id="ambientIntensitySlider" min="0.1" max="1.4" step="0.05" value="0.65">
+                        </div>
+                        <div class="ctrl-group">
+                            <label>Key Sunlight Intensity: <strong id="mainLightValLabel">90%</strong></label>
+                            <input type="range" id="mainLightIntensitySlider" min="0" max="1.8" step="0.05" value="0.90">
+                        </div>
+                        <div class="ctrl-group">
+                            <label>Light Temperature Tint</label>
+                            <div class="swatch-palette" id="lightColorSwatches"></div>
+                        </div>
+                        <hr class="pane-sep">
+                        <div class="quick-light-btns">
+                            <button class="btn btn-outline w-100" id="addCeilingLightBtn"><i class="fa-solid fa-lightbulb"></i> Toggle Ceiling Light</button>
+                            <button class="btn btn-outline w-100" data-quick-sku="LMP-FLR-01"><i class="fa-solid fa-plus"></i> Add Arc Floor Lamp</button>
+                            <button class="btn btn-outline w-100" data-quick-sku="LMP-TBL-02"><i class="fa-solid fa-plus"></i> Add Table Lamp</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drawer-pane" id="decorPanel">
+                    <div class="pane-header">
+                        <h3>Decor & Accessories</h3>
+                        <span class="pane-sub">Plants, rugs, mirrors, curtains & art</span>
+                    </div>
+                    <div class="pane-scroll catalog-grid" id="decorCatalogGrid"></div>
+                </div>
+
+                <div class="drawer-pane" id="themesPanel">
+                    <div class="pane-header">
+                        <h3>Interior Design Themes</h3>
+                        <span class="pane-sub">One-click coordinated room palettes</span>
+                    </div>
+                    <div class="pane-scroll theme-list" id="themesListContainer"></div>
+                </div>
+
+                <div class="drawer-pane" id="budgetPanel">
+                    <div class="pane-header">
+                        <h3>Budget & Reference Photo</h3>
+                        <span class="pane-sub">INR estimation & inspiration photo</span>
+                    </div>
+                    <div class="pane-scroll">
+                        <div class="budget-summary-card">
+                            <div class="b-row"><span>Total Estimate</span><strong id="panelTotalBudget">₹0</strong></div>
+                            <div class="b-row"><span>Placed Items</span><strong id="panelItemCount">0</strong></div>
+                            <div class="budget-progress-bar">
+                                <div class="budget-progress-fill" id="budgetProgressFill" style="width:0%"></div>
+                            </div>
+                            <div class="budget-warning hidden" id="budgetWarningAlert">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Estimated cost exceeds your budget limit!
+                            </div>
+                        </div>
+                        <div class="ctrl-group">
+                            <label>Budget Limit (₹ INR)</label>
+                            <input type="number" id="budgetLimitInput" value="200000" step="5000">
+                        </div>
+
+                        <strong class="sec-title">Category Breakdown</strong>
+                        <div class="breakdown-list" id="categoryBreakdownList"></div>
+
+                        <strong class="sec-title">Itemized List</strong>
+                        <div class="itemized-list" id="itemizedBudgetList"></div>
+
+                        <hr class="pane-sep">
+                        <strong class="sec-title">Room Reference Photo</strong>
+                        <p class="muted-small">Upload a JPG or PNG photo of your real room to keep visible as a visual guide.</p>
+                        <input type="file" id="refPhotoInput" accept="image/jpeg,image/jpg,image/png" class="file-input-box">
+                        <button class="btn btn-outline btn-sm w-100" id="removeRefPhotoBtn">Remove Reference Photo</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="center-viewport">
+            <div class="viewport-hud-top">
+                <div class="view-mode-switch">
+                    <button class="v-btn" id="view2dBtn">2D Top</button>
+                    <button class="v-btn active" id="view3dBtn">3D View</button>
+                    <button class="v-btn" id="viewIsoBtn">Isometric</button>
+                </div>
+                <div class="hud-actions">
+                    <button class="hud-icon-btn" id="toggleOrthoBtn" title="Toggle Perspective / Orthographic">
+                        <i class="fa-solid fa-cube"></i> Ortho/Persp
+                    </button>
+                    <button class="hud-icon-btn" id="resetCameraBtn" title="Reset Camera">
+                        <i class="fa-solid fa-crosshairs"></i> Reset View
+                    </button>
+                </div>
+            </div>
+
+            <div class="collision-banner hidden" id="collisionBanner">
+                <i class="fa-solid fa-triangle-exclamation"></i> Collision Warning: Furniture items overlap!
+            </div>
+
+            <div class="floating-ref-card hidden" id="floatingRefCard">
+                <div class="ref-card-head">
+                    <span>Reference Photo</span>
+                    <button id="closeFloatingRefBtn">&times;</button>
+                </div>
+                <img id="floatingRefImg" src="" alt="Room Reference">
+            </div>
+
+            <div class="floating-context-menu hidden" id="floatingContextMenu">
+                <button id="ctxRotateBtn"><i class="fa-solid fa-rotate-right"></i> Rotate 90°</button>
+                <button id="ctxDuplicateBtn"><i class="fa-regular fa-copy"></i> Duplicate</button>
+                <button id="ctxFocusBtn"><i class="fa-solid fa-magnifying-glass-plus"></i> Focus</button>
+                <button id="ctxDeleteBtn" class="danger"><i class="fa-solid fa-trash"></i> Delete</button>
+            </div>
+
+            <div class="viewport-hud-bottom">
+                <span id="roomDimHudBadge"><i class="fa-solid fa-ruler"></i> 5.4m × 4.6m × 2.8m</span>
+                <span class="hud-hint">Left-drag furniture to move • Right-drag to pan • Scroll to zoom</span>
+            </div>
+
+            <div id="threeCanvasMount"></div>
+        </main>
+
+        <aside class="right-properties">
+            <div class="prop-header">
+                <h3>Properties</h3>
+                <span class="badge-blue" id="selectedBadge">Room Overview</span>
+            </div>
+
+            <div class="prop-empty-state" id="noSelectionState">
+                <div class="empty-icon"><i class="fa-solid fa-hand-pointer"></i></div>
+                <h4>Select Any Furniture</h4>
+                <p>Click an item in the 3D viewport to edit dimensions, coordinates, rotation, color, and material.</p>
+                <div class="quick-summary-box">
+                    <div><span>Placed Items</span><strong id="propObjCount">0 items</strong></div>
+                    <div><span>Estimated Cost</span><strong id="propTotalCost">₹0</strong></div>
+                    <div><span>Active Theme</span><strong id="propActiveTheme">Scandinavian</strong></div>
+                    <div><span>Camera Mode</span><strong id="camProjLabel">Perspective</strong></div>
+                </div>
+            </div>
+
+            <div class="prop-form hidden" id="objectPropertiesForm">
+                <div class="selected-item-banner">
+                    <div>
+                        <h4 id="propItemName">Sofa</h4>
+                        <span id="propItemCategory">Sofas</span>
+                    </div>
+                    <strong class="item-price-tag" id="propItemPrice">₹0</strong>
+                </div>
+
+                <div class="prop-section">
+                    <span class="sec-title">Dimensions (Meters)</span>
+                    <div class="ctrl-row-3">
+                        <div class="mini-field"><span>Width</span><input type="number" id="propWidth" readonly></div>
+                        <div class="mini-field"><span>Height</span><input type="number" id="propHeight" readonly></div>
+                        <div class="mini-field"><span>Depth</span><input type="number" id="propDepth" readonly></div>
+                    </div>
+                    <div class="ctrl-group" style="margin-top:8px;">
+                        <label>Resize Scale: <strong id="propScaleVal">1.00x</strong></label>
+                        <input type="range" id="propScaleSlider" min="0.5" max="1.6" step="0.05" value="1">
+                    </div>
+                </div>
+
+                <div class="prop-section">
+                    <span class="sec-title">Position (X, Y, Z)</span>
+                    <div class="ctrl-row-3">
+                        <div class="mini-field"><span>X (m)</span><input type="number" id="propPosX" step="0.1"></div>
+                        <div class="mini-field"><span>Y (m)</span><input type="number" id="propPosY" step="0.1"></div>
+                        <div class="mini-field"><span>Z (m)</span><input type="number" id="propPosZ" step="0.1"></div>
+                    </div>
+                </div>
+
+                <div class="prop-section">
+                    <span class="sec-title">Rotation: <strong id="propRotVal">0°</strong></span>
+                    <input type="range" id="propRotSlider" min="0" max="360" step="5" value="0" style="width:100%;accent-color:var(--primary);">
+                    <div class="rot-quick-btns">
+                        <button class="btn btn-outline btn-sm" id="propRotMinus90">-90°</button>
+                        <button class="btn btn-outline btn-sm" id="propRotPlus90">+90°</button>
+                    </div>
+                </div>
+
+                <div class="prop-section">
+                    <span class="sec-title">Color & Finish Material</span>
+                    <div class="swatch-palette" id="propColorSwatches"></div>
+                    <input type="color" id="propCustomColor" class="color-picker-bar" style="margin-bottom:8px;">
+                    <select id="propMaterialSelect" style="width:100%;padding:7px;border:1px solid var(--border);border-radius:7px;">
+                        <option value="wood">Natural Wood</option>
+                        <option value="fabric">Woven Fabric</option>
+                        <option value="leather">Matte Leather</option>
+                        <option value="marble">Polished Marble</option>
+                        <option value="metal">Brushed Metal</option>
+                        <option value="glass">Tinted Glass</option>
+                    </select>
+                </div>
+
+                <div class="prop-actions-footer">
+                    <button class="btn btn-outline btn-sm" id="propDuplicateBtn"><i class="fa-regular fa-copy"></i> Duplicate</button>
+                    <button class="btn btn-danger-outline btn-sm" id="propDeleteBtn"><i class="fa-solid fa-trash"></i> Delete</button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/materials.js"></script>
+    <script src="assets/js/furniture.js"></script>
+    <script src="assets/js/lighting.js"></script>
+    <script src="assets/js/camera.js"></script>
+    <script src="assets/js/budget.js"></script>
+    <script src="assets/js/export.js"></script>
+    <script src="assets/js/room3d.js"></script>
+</body>
+</html>

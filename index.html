@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROOMIFY — Interactive 3D Room Interior Designer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <header class="landing-nav">
+        <a href="index.html" class="brand-logo">
+            <span class="logo-icon"><i class="fa-solid fa-cube"></i></span>
+            <span>ROOMIFY</span>
+        </a>
+        <div class="landing-nav-links">
+            <a href="dashboard.html" style="font-weight:600;font-size:0.9rem;">My Designs</a>
+            <a href="editor.html" class="btn btn-white"><i class="fa-solid fa-compass-drafting"></i> Launch 3D Studio</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero-section">
+            <div>
+                <span class="hero-badge"><i class="fa-solid fa-sparkles"></i> Browser-Based 3D Space Planner</span>
+                <h1>Design, Furnish & Visualize Any Room in Real-Time 3D.</h1>
+                <p>Configure custom room dimensions, drag and drop 3D furniture priced in Indian Rupees (₹), switch between 2D floor plans and 3D cutaway perspectives, apply curated themes, and export high-resolution renders.</p>
+                <div class="hero-cta-row">
+                    <a href="editor.html" class="btn btn-primary btn-lg"><i class="fa-solid fa-cube"></i> Open 3D Room Editor</a>
+                    <a href="dashboard.html" class="btn btn-outline btn-lg"><i class="fa-solid fa-folder-open"></i> Manage My Designs</a>
+                </div>
+            </div>
+            <div class="hero-preview-card">
+                <div class="iso-stage-mock">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <h3>Interactive Cutaway 3D & 2D Workspace</h3>
+                    <p style="font-size:0.86rem;margin:8px 0 16px;">Pre-loaded with a Scandinavian Studio Living Room ready to customize.</p>
+                    <a href="editor.html?id=101" class="btn btn-primary">Inspect Starter Room</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fa-solid fa-vector-square"></i>
+                    <h3>Custom Room Architecture</h3>
+                    <p>Set room width, length, wall height, thickness, door placement, and window openings dynamically.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-couch"></i>
+                    <h3>Drag & Drop 3D Catalog</h3>
+                    <p>21+ procedural 3D furniture & decor models with live collision alerts, 90° rotation, and resizing.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                    <h3>Live ₹ Budget Tracker</h3>
+                    <p>Automatic category-wise cost calculation in INR with customizable budget limit warnings.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-database"></i>
+                    <h3>Full Project Persistence</h3>
+                    <p>Save, reopen, rename, duplicate, and export clean PNG renders of your interior layouts.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
